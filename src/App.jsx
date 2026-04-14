@@ -351,7 +351,7 @@ function Chat({ persona, profile }) {
     const firstName = profile.name.split(" ")[0];
     setMessages([{
       role:    "assistant",
-      content: `Hi ${firstName}! I'm Aria, your Velo knowledge assistant. I can help you with company policies, onboarding steps, benefits, PTO, expense reporting, team processes, and anything else you need to know about working at Velo. What can I help you with today?`,
+      content: `Hi ${firstName}! I'm Aria, your Velo knowledge assistant. I can help you with company policies, onboarding steps, benefits, PTO, expense reporting, team processes, and anything else you need to know about working at Velo.\n\nThis portal includes 4 employee profiles you can switch between using the Switch Employee button on the left — a new engineering hire, a sales manager, an HR operations lead, and a VP of Customer Success. Each persona has different tenure, role-specific documents, and their own PTO and expense requests. Try asking the same question as different employees to see how answers change.\n\nWhat can I help you with today?`,
     }]);
     setInput("");
   }, [profile?.name]);
