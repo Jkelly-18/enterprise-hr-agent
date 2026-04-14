@@ -14,6 +14,8 @@ The solution is Aria, an AI-powered HR agent that gives every employee instant, 
 
 A new engineer asking about their first 30 days gets the engineering onboarding plan. A six year VP asking about PTO gets told they are on the unlimited tier based on their actual start date pulled directly from the database. Every answer reflects the individual, not generic policy text.
 
+The portal also displays each employee's active PTO requests and expense reports directly in the sidebar, giving employees a single place to both ask questions and track the status of their own HR activity in real time.
+
 ---
 
 ## How It Works
@@ -160,12 +162,11 @@ enterprise-knowledge-agent/
 ├── src/
 │   ├── App.jsx             # React frontend, all components
 │   └── App.css             # Styles
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package.json
-├── package-lock.json
-├── Procfile                # Railway startup command
+├── .gitignore              
+├── eslint.config.js        # JavaScript linting configuration
+├── index.html              # React app entry point
+├── package.json            # Node dependencies and build scripts
+├── package-lock.json       # Locked Node dependency versions
 ├── requirements.txt        # Python dependencies
 └── vite.config.js          # Vite build configuration
 ```
@@ -182,35 +183,49 @@ git clone https://github.com/Jkelly-18/enterprise-knowledge-agent.git
 cd enterprise-knowledge-agent
 ```
 
-**2. Set up Python environment**
+**2. Create and activate a virtual environment**
+
+The virtual environment isolates Python dependencies for this project.
 ```bash
 python -m venv venv
 venv\Scripts\activate        # Windows
 source venv/bin/activate     # Mac/Linux
+```
+
+**3. Install Python dependencies**
+```bash
 pip install -r requirements.txt
 ```
 
-**3. Configure environment variables**
+**4. Create your .env file**
 
-Create a `.env` file in the root directory:
+The `.env` file is not included in the repository for security reasons.
+Create it manually in the root directory with the following contents:
+
 ```
 OPENAI_API_KEY=your_key_here
 DATABASE_URL=sqlite:///./internal_data/velo.db
 CHROMA_PATH=./internal_data/chroma
 ```
 
-**4. Seed the database and ingest documents**
+You can get an OpenAI API key at platform.openai.com. The database and
+ChromaDB paths are created automatically in the next step.
+
+**5. Seed the database and ingest documents**
+
+These scripts generate the SQLite database and load all 13 documents
+into ChromaDB. They must be run before starting the backend.
 ```bash
 python scripts/seed_database.py
 python scripts/ingest_docs.py
 ```
 
-**5. Start the backend**
+**6. Start the backend**
 ```bash
 uvicorn backend.main:app --reload --port 8000
 ```
 
-**6. Start the frontend**
+**7. Install Node dependencies and start the frontend**
 ```bash
 npm install
 npm run dev
