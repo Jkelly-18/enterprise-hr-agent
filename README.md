@@ -144,6 +144,52 @@ The React frontend is built with Vite and deployed to Netlify as a static site. 
 
 ---
 
+## Evaluation
+
+The system was evaluated using representative enterprise HR and onboarding scenarios to verify that the agent could correctly combine structured employee data with unstructured company documents when answering personalized questions.
+
+Example scenarios tested included:
+
+- **PTO accrual for new employees within their first year**  
+  Verified that the agent checked the employee's exact start date and tenure in the database before determining the correct PTO accrual logic rather than returning a generic PTO policy answer.
+
+- **Team member and department questions**  
+  Verified that the agent could answer questions about an employee's team structure, department context, and related employee details using database-backed information.
+
+- **Personalized PTO and department-level policy questions**  
+  Verified that for questions involving PTO eligibility or department-relevant guidance, the agent first referenced structured employee context such as role, department, and tenure, then retrieved the most relevant policy or onboarding documents for that specific employee.
+
+- **Role-specific onboarding guidance**  
+  Verified that employees in different roles received different answers when asking the same onboarding question, based on role-aware retrieval over the company document set.
+
+- **Employee-specific HR activity**  
+  Verified that the system could retrieve active PTO requests and expense reports tied to the current employee persona.
+
+These scenarios were used to confirm that the agent could correctly choose between database querying, document retrieval, or a combination of both depending on the question type and the employee context.
+
+---
+
+## Limitations
+
+This project is designed as a portfolio demonstration of an enterprise AI workflow and includes several intentional limitations that would need to be addressed in a production deployment.
+
+- **Demo-scale data**  
+    The employee records, HR requests, and company documents are smaller and simpler than those in a real enterprise environment. The project is designed to demonstrate the workflow and architecture rather than production-scale data complexity.
+
+- **LLM reliability**  
+  Like any LLM-based system, responses may occasionally be incomplete or overly confident if retrieval misses relevant context or the model reasons incorrectly.
+
+- **SQL and tool-use guardrails**  
+  The database querying workflow is effective for demonstration purposes, but production use would require stronger validation, monitoring, and guardrails around tool behavior.
+
+- **Authentication and access control**  
+  The application simulates personalization by persona, but it does not implement enterprise-grade authentication, authorization, or document-level permissions.
+
+- **Evaluation scope**  
+  Validation is currently based on representative functional scenarios and live demo testing rather than a fully automated evaluation framework.
+
+---
+
 ## Project Structure
 
 ```
