@@ -179,8 +179,8 @@ enterprise-knowledge-agent/
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/Jkelly-18/enterprise-knowledge-agent.git
-cd enterprise-knowledge-agent
+git clone https://github.com/Jkelly-18/enterprise-hr-agent.git
+cd enterprise-hr-agent
 ```
 
 **2. Create and activate a virtual environment**
