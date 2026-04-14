@@ -1,1 +1,0 @@
-web: python scripts/seed_database.py && python scripts/ingest_docs.py && uvicorn backend.main:app --host 0.0.0.0 --port $PORT
