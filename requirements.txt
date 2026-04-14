@@ -1,0 +1,15 @@
+langchain
+langchain-openai
+langchain-community
+langchain-text-splitters
+openai
+chromadb
+tiktoken
+pypdf
+sqlalchemy
+faker
+pandas
+fastapi
+uvicorn
+pydantic
+python-dotenv

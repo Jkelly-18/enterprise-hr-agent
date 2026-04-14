@@ -1,0 +1,8 @@
+.env
+venv/
+internal_data/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+*.dist-info
