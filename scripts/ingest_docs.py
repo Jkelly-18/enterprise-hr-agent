@@ -33,14 +33,11 @@ DOCS_DIR        = Path("company_docs")
 CHROMA_PATH     = os.getenv("CHROMA_PATH", "./internal_data/chroma")
 OPENAI_API_KEY  = os.getenv("OPENAI_API_KEY")
 COLLECTION_NAME = "velo_knowledge_base"
+CHUNK_SIZE      = 800
+CHUNK_OVERLAP   = 150
 
-# Chunking settings
-CHUNK_SIZE      = 800   # characters per chunk
-CHUNK_OVERLAP   = 150   # overlap between chunks to preserve context
-
-# Imports 
 if not OPENAI_API_KEY:
-    print(" OPENAI_API_KEY not found in .env file. Exiting.")
+    print("OPENAI_API_KEY not found in .env file. Exiting.")
     sys.exit(1)
 
 from pypdf import PdfReader
@@ -65,9 +62,8 @@ text_splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", ". ", " ", ""],
 )
 
-# Helper Functions
+# Helper Functions 
 def extract_text_from_pdf(pdf_path: Path) -> str:
-    """Extract all text from a PDF file."""
     reader = PdfReader(str(pdf_path))
     text = ""
     for page in reader.pages:
@@ -77,7 +73,6 @@ def extract_text_from_pdf(pdf_path: Path) -> str:
     return text.strip()
 
 def get_doc_category(filename: str) -> str:
-    """Infer document category from filename prefix."""
     categories = {
         "01": "general_onboarding",
         "02": "role_onboarding_engineering",
@@ -93,11 +88,9 @@ def get_doc_category(filename: str) -> str:
         "12": "internal_process_cs",
         "13": "company",
     }
-    prefix = filename[:2]
-    return categories.get(prefix, "general")
+    return categories.get(filename[:2], "general")
 
 def get_relevant_roles(filename: str) -> str:
-    """Tag which roles this document is most relevant to."""
     role_map = {
         "01": "all",
         "02": "engineering",
@@ -113,26 +106,19 @@ def get_relevant_roles(filename: str) -> str:
         "12": "customer_success",
         "13": "all",
     }
-    prefix = filename[:2]
-    return role_map.get(prefix, "all")
+    return role_map.get(filename[:2], "all")
 
-# Ingestion 
+# Ingestion
 def ingest_documents():
-    """Main ingestion pipeline — reads PDFs, chunks, embeds, stores."""
-
-    # Check company_docs folder exists and has PDFs
     if not DOCS_DIR.exists():
-        print(" company_docs/ folder not found")
+        print("company_docs/ folder not found. Exiting.")
         sys.exit(1)
 
     pdf_files = sorted(DOCS_DIR.glob("*.pdf"))
     if not pdf_files:
-        print(f"❌ No PDF files found in {DOCS_DIR}/")
+        print(f"No PDF files found in {DOCS_DIR}/. Exiting.")
         sys.exit(1)
 
-    print(f"  📄 Found {len(pdf_files)} PDF files in {DOCS_DIR}/")
-
-    # Delete and recreate collection for clean ingestion
     try:
         client.delete_collection(COLLECTION_NAME)
     except Exception:
@@ -151,28 +137,20 @@ def ingest_documents():
         filename = pdf_path.name
         doc_name = filename.replace(".pdf", "").replace("_", " ").title()
 
-        print(f"\n  📃 Processing: {filename}")
-
-        # Extract text
         raw_text = extract_text_from_pdf(pdf_path)
         if not raw_text:
-            print(" No text extracted — skipping")
             continue
 
-        # Chunk the text
-        chunks = text_splitter.split_text(raw_text)
-
-        # Build metadata for each chunk
-        category     = get_doc_category(filename)
-        relevant_to  = get_relevant_roles(filename)
+        chunks      = text_splitter.split_text(raw_text)
+        category    = get_doc_category(filename)
+        relevant_to = get_relevant_roles(filename)
 
         ids       = []
         documents = []
         metadatas = []
 
         for i, chunk in enumerate(chunks):
-            chunk_id = f"{filename}__chunk_{i:04d}"
-            ids.append(chunk_id)
+            ids.append(f"{filename}__chunk_{i:04d}")
             documents.append(chunk)
             metadatas.append({
                 "source":       filename,
@@ -183,7 +161,6 @@ def ingest_documents():
                 "total_chunks": len(chunks),
             })
 
-        # Add to ChromaDB in batches of 50 to avoid API rate limits
         batch_size = 50
         for start in range(0, len(ids), batch_size):
             end = start + batch_size
@@ -195,33 +172,20 @@ def ingest_documents():
 
         total_chunks += len(chunks)
         doc_summaries.append({
-            "filename":     filename,
-            "chunks":       len(chunks),
-            "category":     category,
-            "relevant_to":  relevant_to,
-            "char_count":   len(raw_text),
+            "filename":    filename,
+            "chunks":      len(chunks),
+            "category":    category,
+            "relevant_to": relevant_to,
         })
 
     return collection, total_chunks, doc_summaries
 
-##  Summary Report
-def print_summary(total_chunks, doc_summaries):
-    print("\nINGESTION SUMMARY")
-    print("="*40)
-    for doc in doc_summaries:
-        print(f"  {doc['filename']:<45} {doc['chunks']} chunks")
-    print(f"  {'TOTAL':<45} {total_chunks} chunks")
-    print("="*40)
-
-# Main 
+#  Main
 def main():
-    print("\nVELO — Document Ingestion Script")
-    print(f"Scanning {DOCS_DIR}/ for PDF documents...")
-
     collection, total_chunks, doc_summaries = ingest_documents()
+    print(f"Documents ingested successfully {len(doc_summaries)} docs, {total_chunks} chunks total.")
 
-    print_summary(total_chunks, doc_summaries)
-    print("\n Documents ingested successfully!")
 
 if __name__ == "__main__":
     main()
+    
