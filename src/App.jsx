@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API = "https://web-production-e6005.up.railway.app/";
+const API = "https://web-production-e6005.up.railway.app";
 
 // ─── About Modal ──────────────────────────────────────────────────────────────
 function AboutModal({ onClose }) {
